@@ -52,18 +52,18 @@
     <form id="search-form" method="GET" action="{{ route('applications.index') }}">
     <div class="row mb-3">
         <div class="col-md-2">
-            <select id="status-filter" name="status" class="form-control">              
+            <select id="status-filter" name="status" class="form-control">
                 <option value="all" {{ request('status') == 'all' ? 'selected' : '' }}>All</option>
                 <option value="ongoing" {{ request('status') == 'ongoing' ? 'selected' : '' }}>Ongoing</option>
                 <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                <option value="passed" {{ request('status') == 'passed' ? 'selected' : '' }}>Verified</option>
-                <option value="failed" {{ request('status') == 'failed' ? 'selected' : '' }}>Denied</option>
+                <option value="verified" {{ request('status') == 'verified' ? 'selected' : '' }}>Verified</option>
+                <option value="denied" {{ request('status') == 'denied' ? 'selected' : '' }}>Denied</option>
             </select>
         </div>
-        <div class="col-md-6 custom-align">
+        <div class="col-md-6">
             <input type="text" name="search" id="search" value="{{ request('search') }}" class="form-control" placeholder="Search by ID or other fields..." />
         </div>
-        <div class="col-md-4">
+        <div class="col-md-2">
             <button type="submit" class="btn btn-primary">Search</button>
         </div>
     </div>
@@ -79,7 +79,6 @@
                         <th>ID</th>
                         <th>Facility</th>
                         <th>Province/City</th>
-                        <th>City</th>
                         <th>Address</th>
                         <th>Contact Number</th>
                         <th>Designation</th>
@@ -96,7 +95,6 @@
                             <td>{{ $application->id }}</td>
                             <td>{{ $application->facility }}</td>
                             <td>{{ $application->province_city }}</td>
-                            <td>{{ $application->city }}</td>
                             <td>{{ $application->address }}</td>
                             <td>{{ $application->contact_number }}</td>
                             <td>{{ $application->designation }}</td>
@@ -110,8 +108,8 @@
                             <td>
                                 <strong>
                                     <span class="{{ $application->status === 'ongoing' ? 'text-orange' : '' }} 
-                                                {{ $application->status === 'passed' ? 'text-success' : '' }} 
-                                                {{ $application->status === 'failed' ? 'text-danger' : '' }}">
+                                                {{ $application->status === 'verified' ? 'text-success' : '' }} 
+                                                {{ $application->status === 'denied' ? 'text-danger' : '' }}">
                                         {{ ucfirst($application->status) }}
                                     </span>
                                     @if($application->status === 'ongoing')
@@ -316,43 +314,6 @@
                     toastr.error('Failed to delete application!');
                 }
             }
-        });
-    });
-    $(document).ready(function() {
-        $('#search').on('input', function() {
-            const searchTerm = $(this).val();
-            const status = $('#status-filter').val();
-            let url = '{{ route('applications.index') }}';
-
-            if (searchTerm) {
-                // If there's a search term, update the URL with the search parameter
-                url += '?search=' + encodeURIComponent(searchTerm);
-                if (status && status !== 'all') {
-                    url += '&status=' + status; // Include status if it's not 'all'
-                }
-            } else {
-                // If the search box is cleared, redirect to the index route without parameters
-                if (status && status !== 'all') {
-                    url += '?status=' + status; // Keep the status if it's selected
-                }
-            }
-
-            window.location.href = url; // Redirect to the constructed URL
-        });
-
-        $('#status-filter').change(function() {
-            const status = $(this).val();
-            const search = $('#search').val();
-            let url = '{{ route('applications.index') }}?';
-
-            if (status && status !== 'all') {
-                url += 'status=' + status + '&';
-            }
-            if (search) {
-                url += 'search=' + search + '&';
-            }
-
-            window.location.href = url; // Redirect to filtered URL
         });
     });
 

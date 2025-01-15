@@ -1,17 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Application Status Update</title>
 </head>
 <body>
-    <p>Dear {{ $head_of_unit->name }},</p>
-
-    <p>We are writing to inform you about the status of the application for the facility <strong>{{ $facility->name }}</strong>.</p>
-
-    <p><strong>Status:</strong> {{ ucfirst($status) }}</p>
-    <p>{{ $message }}</p>
-
-    <p>Best regards,<br>
-    {{ $senderEmail }}</p>
+    <h1>Status Update for {{ $facility->name }}</h1>
+    <p>Dear {{ $head_of_unit }},</p> <!-- Receiver's dynamic name -->
+    <p>We are writing to inform you that the application for the facility <strong>{{ $facility->name }}</strong> has been updated to the status: <strong>{{ ucfirst($status) }}</strong>.</p>
+    <p>{{ $message }}</p> <!-- Custom dynamic message -->
+    <p>Thank you for using NTP Manager.</p>
+    <p>Best Regards,<br>{{ $senderEmail }}</p> <!-- Sender's dynamic email -->
 </body>
 </html>

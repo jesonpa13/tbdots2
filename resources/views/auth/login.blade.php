@@ -38,11 +38,11 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 1) 10%, rgba(173, 255, 47, 1) 40%, rgba(34, 139, 34, 1) 70%, rgba(255, 255, 224, 1) 100%);
+            background: linear-gradient(90deg, rgba(133,231,118,1) 0%, rgba(29,194,7,1) 50%, rgba(16,162,0,1) 100%);
             background-size: 400% 400%; /* Allows the gradient to shift smoothly */
             background-attachment: fixed;
             position: relative;
-            animation: gradient 15s ease infinite; /* Adds animation to the gradient */
+           
         }
 
         .background-overlay {
@@ -124,6 +124,22 @@
             font-size: 0.9rem;
             margin-top: 5px;
         }
+        .btn-warning{
+            background-color: red;
+            padding: 8px 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            width: 100%;
+            color: white;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease, background-color 0.3s ease;    
+        }
+        .btn-warning:hover {
+            background-color: #f39c12;
+            transform: scale(1.05);
+        }
 
         .submit-btn {
             background-color: #009933;
@@ -177,26 +193,6 @@
             left: 0;
             z-index: -1;
         }
-
-        @keyframes wave {
-            2% { transform: translateX(1); }
-            25% { transform: translateX(-25%); }
-            50% { transform: translateX(-50%); }
-            75% { transform: translateX(-25%); }
-            100% { transform: translateX(1); }
-        }
-        @keyframes gradient {
-            0% {
-                background-position: 0% 0%;
-            }
-            50% {
-                background-position: 100% 100%;
-            }
-            100% {
-                background-position: 0% 0%;
-            }
-        }
-
         @media (max-width: 768px) {
             .login-container {
                 flex-direction: column;
@@ -232,65 +228,86 @@
         .register-link a {
             text-decoration: underline;
         }
-
+        .alert-warning {
+    background-color: #f8d7da; /* Light red for visibility */
+    color: #721c24; /* Dark red text */
+    border: 1px solid #f5c6cb; /* Matching border */
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+        
     </style>
 </head>
 <body>
     <div class="background-overlay"></div>
 
     <div class="login-container">
-        <div class="login-form">
-            <h1>Login to TB DOTS System</h1>
+    <div class="login-form">
+    <h1>Login to TB DOTS System</h1>
 
-            <!-- Authentication Form -->
-            <form method="POST" action="{{ route('login') }}">
-                @csrf
-
-                <!-- Email Address -->
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username">
-                    <div class="input-error">{{ $errors->first('email') }}</div>
-                </div>
-
-                <!-- Password -->
-                <div class="form-group">
-                    <label for="password" class="col-md-4 control-label">Password</label>
-                    <div class="col-md-6">
-                        <input id="password-field" type="password" class="form-control" name="password">
-                        <span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
-                    </div>
-                    <div class="input-error">{{ $errors->first('password') }}</div>
-                </div>
-
-                <!-- Remember Me -->
-                <div class="form-group">
-                    <label for="remember_me" class="remember-label">
-                        <input id="remember_me" type="checkbox" name="remember">
-                        <span>Remember me</span>
-                    </label>
-                </div>
-
-                <!-- Forgot Password and Submit -->
-                <a href="{{ route('password.request') }}" class="forgot-password">Forgot your password?</a>
-                
-                <!-- Register Link -->
-                <div class="register-link">
-                    <p style="color:#009933">Don't have an account? <a href="{{ route('register') }}" class="forgot-password">Register here</a></p>
-                </div>
-
-                <button type="submit" class="submit-btn">Log in</button>
-            </form>
+    <!-- Display error messages -->
+    @if($errors->has('status'))
+        <div class="alert alert-warning">
+            {{ $errors->first('status') }}
         </div>
+    @endif
+
+    <!-- Authentication Form -->
+    <form method="POST" action="{{ route('login') }}">
+        @csrf
+
+        <!-- Email Address -->
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username">
+            <div class="input-error">{{ $errors->first('email') }}</div>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+            <label for="password">Password</label>
+            <div class="col-md-6">
+                <input id="password-field" type="password" name="password">
+                <span toggle="#password-field" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+            </div>
+            <div class="input-error">{{ $errors->first('password') }}</div>
+        </div>
+
+        <!-- Remember Me -->
+        <div class="form-group">
+            <label for="remember_me" class="remember-label">
+                <input id="remember_me" type="checkbox" name="remember">
+                <span>Remember me</span>
+            </label>
+        </div>
+
+        <!-- Forgot Password and Submit -->
+        <a href="{{ route('password.request') }}" class="forgot-password">Forgot your password?</a>
+
+        <!-- Register Link -->
+        <div class="register-link">
+            <p style="color:#009933">Don't have an account? <a href="{{ route('register') }}" class="forgot-password">Register here</a></p>
+        </div>
+
+        <button type="submit" class="submit-btn">Log in</button>
+        <br><br>
+        <button type="button" id="cancel-btn" class="btn-warning">Cancel</button>
+    </form>
+</div>
 
         <div class="building-image"></div>
     </div>
 
-    <div class="wave"></div>
+    
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script>
         $(document).ready(function() {
+            $('#cancel-btn').click(function() {
+            window.location.href = "{{ route('welcome') }}"; // Redirect to welcome page
+        });
+        
             $(".toggle-password").click(function() {
                 $(this).toggleClass("fa-eye fa-eye-slash");
                 var input = $("#password-field");

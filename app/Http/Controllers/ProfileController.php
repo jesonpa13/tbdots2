@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\AdditionalInformation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,21 +21,33 @@ class ProfileController extends Controller
             'user' => $request->user(),
         ]);
     }
+    public function home(){
+
+       $additionalInfo = AdditionalInformation::where('user_id', auth()->id())->first();
+        
+        // Pass the additional information to the view
+        return view('profile.home', compact('additionalInfo'));
+    }
 
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(Request $request)
     {
-        $request->user()->fill($request->validated());
+        $user = auth()->user();
+        $validatedData = $request->validate([
+            'province_city' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'facility' => 'required|string|max:255',
+            'head_of_unit' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'contact_number' => 'required|string|max:255',
+            'designation' => 'required|string|max:255',
+        ]);
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
+        $user->additionalInformation()->update($validatedData);
 
-        $request->user()->save();
-
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return redirect()->route('profile.edit')->with('success', 'Profile updated successfully.');
     }
 
     /**

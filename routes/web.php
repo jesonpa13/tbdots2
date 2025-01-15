@@ -16,7 +16,7 @@ use App\Http\Controllers\Admin\SettingsController; // Ensure SettingsController 
 use App\Http\Controllers\NTPManagerController;
 use App\Http\Controllers\UserListController;
 use App\Http\Controllers\RequestController;
-
+use App\Http\Controllers\AdditionalInformationController;
 
 
 
@@ -59,6 +59,8 @@ Route::get('/downloads/self-assessment-tool', function () {
 })->name('download.selfAssessmentTool');
 
 
+
+
 // Handle the submission of a new application
 Route::post('/client.sendrequest', [RequestController::class, 'store'])->name('client.sendrequest.store');
 
@@ -91,8 +93,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::delete('/admin/users/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
     Route::get('admin/settings', [SettingsController::class, 'edit'])->name('admin.settings');
     Route::put('admin/settings', [SettingsController::class, 'update'])->name('admin.settings.update');
-    Route::post('/admin/users/{user}/deactivate', [UserController::class, 'deactivate'])->name('admin.users.deactivate');
+    Route::post('/admin/users/{user}/approve', [UserController::class, 'approve'])->name('admin.users.approve');
     Route::post('/admin/users/{user}/activate', [UserController::class, 'activate'])->name('admin.users.activate');
+    Route::post('/admin/users/{user}/deactivate', [UserController::class, 'deactivate'])->name('admin.users.deactivate');
 });
 
 // NTP Manager Dashboard Route - accessible to authenticated users
@@ -133,7 +136,7 @@ Route::middleware(['auth', 'client'])->group(function () {
     // Route to show application status to clients
     Route::get('/application-status', [ApplicationController::class, 'showStatus'])->name('application.status');
 
-
+    Route::post('/additional-info', [AdditionalInformationController::class, 'store'])->name('additional-info.store');
     // Show the form to send a request
     Route::get('/client.sendrequest', [RequestController::class, 'index'])->name('client.sendrequest');
 
@@ -142,6 +145,9 @@ Route::middleware(['auth', 'client'])->group(function () {
 
     Route::get('/client.sendrequest', [ApplicationController::class, 'showstatus'])->name('client.applicationstatus');
 
+    Route::get('/application/{id}/edit', [ApplicationController::class, 'edit'])->name('edit.application');
+
+    Route::put('/application/{id}/update', [ApplicationController::class, 'update'])->name('update.application');
 
     // Application routes for storing a new application
     Route::post('/application/store', [ApplicationController::class, 'store'])->name('application.store');
@@ -174,6 +180,7 @@ Route::post('/applications/{id}/verify', [ApplicationController::class, 'verify'
 // Route for viewing applications from the PDOHO perspective
 Route::get('/layouts.pdoholayout', [ApplicationController::class, 'viewApplicationslist'])->name('pdoho.applications');
 
+Route::get('welcome', [RegisteredUserController::class, 'welcomepage'])->name('welcome');
 
 // Public homepage route
 Route::get('/', function () {
@@ -188,10 +195,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     // Route to edit user profile
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile', [ProfileController::class, 'home'])->name('profile.edit');
     
     // Route to update user profile information
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     
     // Route to delete user profile
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

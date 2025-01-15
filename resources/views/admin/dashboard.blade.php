@@ -15,7 +15,7 @@
             </div>
             <div>
                 <h3 class="font-bold text-lg">Total Users</h3>
-                <p class="text-2xl"></p>
+                <p class="text-2xl">{{ $userCount }}</p>
             </div>
         </div>
 
@@ -26,7 +26,7 @@
             </div>
             <div>
                 <h3 class="font-bold text-lg">Active Roles</h3>
-                <p class="text-2xl"></p>
+                <p class="text-2xl">{{ $activeRolesCount }}</p>
             </div>
         </div>
 

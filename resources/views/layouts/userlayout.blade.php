@@ -96,7 +96,7 @@
             font-size: 0.875rem;
             color: white;
             margin-top: -0.90rem;
-            margin-right: 2.5rem;
+            margin-right: -2.6px;
             text-decoration: underline;
         }
         .button-assessment{
@@ -105,6 +105,39 @@
         .text-orange{
             color: orange;
         }
+        .loader {
+        width: 30px;
+        aspect-ratio: 1;
+        background: #554236;
+        display: grid;
+        transform-origin: top right;
+        animation: l5-0 4s infinite linear;
+    }
+    .loader::before,
+    .loader::after {
+        content: "";
+        grid-area: 1/1;
+        background: #f77825;
+        transform-origin: inherit;
+        animation: inherit;
+        animation-name: l5-1;
+        animation-duration: 1s;
+    }
+    .loader::after {
+        background: #60B99A;
+        --s: 60deg;
+    }
+    @keyframes l5-0 {
+        0%, 5%   {transform: rotate(0)}
+        25%, 30% {transform: rotate(90deg)}
+        50%, 55% {transform: rotate(180deg)}
+        75%, 80% {transform: rotate(270deg)}
+        100%    {transform: rotate(360deg)}
+    }
+    @keyframes l5-1 {
+        50% {transform: rotate(var(--s, 30deg))}
+        100% {transform: rotate(0)}
+    }
 </style>
 
     <script>
@@ -139,18 +172,18 @@
                         {{ Auth::user()->name }}
                         <i class="fas fa-caret-down ml-2"></i>
                     </button>
-                    <span class="role-text" style="margin-left:30px;">{{ Auth::user()->user_type }}</span>
+                    <span class="role-text" style="margin-left:7px;">{{ Auth::user()->user_type }}</span>
                 </x-slot>
                 <x-slot name="content">
                     <x-dropdown-link :href="route('profile.edit')"
-                                     class="hover:bg-green-600 hover:text-white focus:bg-green-600 focus:text-white active:bg-green-700 active:text-white">
+                                    class="text-white hover:bg-green-600 hover:text-white focus:bg-green-600 focus:text-white active:text-white bg-green-700">
                         {{ __('Profile') }}
                     </x-dropdown-link>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <x-dropdown-link :href="route('logout')"
-                                         onclick="event.preventDefault(); this.closest('form').submit();"
-                                         class="hover:bg-red-600 hover:text-white focus:bg-red-600 focus:text-white active:bg-red-700 active:text-white">
+                                        onclick="event.preventDefault(); this.closest('form').submit();"
+                                        class="text-white hover:bg-green-600 hover:text-white focus:bg-green-600 focus:text-white active:text-white bg-green-700">
                             {{ __('Log Out') }}
                         </x-dropdown-link>
                     </form>
@@ -186,6 +219,8 @@
 
     <!-- Main Content Container -->
     <div class="content-container">
+        
+
         <main class="content-card">
             @yield('content')
         </main>
@@ -195,5 +230,6 @@
             <p>&copy; {{ date('Y') }} TBDOTS SYSTEM. All rights reserved.</p>
         </footer>
     </div>
+    
 </body>
 </html>

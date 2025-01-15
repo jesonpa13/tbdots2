@@ -13,17 +13,17 @@ class UserController extends Controller
     // Display a listing of users
     public function index(Request $request)
     {
-         // Get the search query from the request
-    $search = $request->get('search');
+        // Get the search query from the request
+        $search = $request->get('search');
 
-    // Fetch users with the search query applied
-    $users = User::query()
-        ->when($search, function($query, $search) {
-            return $query->where('name', 'like', "%{$search}%");
-        })
-        ->get();
+        // Fetch users with the search query applied
+        $users = User::query()
+            ->when($search, function ($query, $search) {
+                return $query->where('name', 'like', "%{$search}%");
+            })
+            ->get();
 
-    return view('admin.users.index', compact('users'));
+        return view('admin.users.index', compact('users'));
     }
 
     // Show the form for creating a new user
@@ -101,21 +101,45 @@ class UserController extends Controller
         // Redirect back with success message
         return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
     }
-    // UserController.php
-public function deactivate(User $user)
-{
-    $user->status = 'inactive';
-    $user->save();
 
-    return redirect()->route('admin.users.index')->with('success', 'User deactivated successfully.');
+    public function approve(User $user)
+{
+    if ($user->status === 'pending') {
+        $user->status = 'active'; // Automatically set status to active when approved
+        $user->save();
+        return redirect()->route('admin.users.index')->with('success', 'User approved successfully.');
+    }
+
+    return redirect()->route('admin.users.index')->with('error', 'User is not in a pending state.');
 }
 
 public function activate(User $user)
 {
-    $user->status = 'active';
-    $user->save();
+    if ($user->status === 'inactive') {
+        $user->status = 'active';
+        $user->save();
+        return redirect()->route('admin.users.index')->with('success', 'User activated successfully.');
+    }
 
-    return redirect()->route('admin.users.index')->with('success', 'User reactivated successfully.');
+    return redirect()->route('admin.users.index')->with('error', 'User is not in an inactive state.');
 }
 
+public function deactivate(User $user)
+{
+    if ($user->status === 'active') {
+        $user->status = 'inactive';
+        $user->save();
+        return redirect()->route('admin.users.index')->with('success', 'User deactivated successfully.');
+    }
+
+    return redirect()->route('admin.users.index')->with('error', 'User is not in an active state.');
+}
+
+    // Update user status using the new method
+    public function updateStatus(User $user, Request $request)
+    {
+        $user->update(['status' => $request->status]);
+        return redirect()->back()->with('success', 'User status updated successfully.');
+    }
+ 
 }

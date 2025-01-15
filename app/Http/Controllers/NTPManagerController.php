@@ -35,7 +35,7 @@ class NTPManagerController extends Controller
       // Count the unique facilities associated with 'passed' applications
       // Using the 'facility' column from the applications table to count distinct facilities
       $totalFacilities = Application::where('status', 'passed')
-                                    ->distinct('facility')  // Count unique facilities based on the 'facility' column
+                                        // Count unique facilities based on the 'facility' column
                                     ->count();
 
       // Pass data to the view
@@ -123,38 +123,44 @@ class NTPManagerController extends Controller
     }
     
     private function sendNotification($application, $message)
-    {
-        try {
-            $user = Auth::user(); // Current NTP manager
-            $senderEmail = $user->email;
-            $senderName = $user->name;
-    
-            $subject = "Application Status Update for {$application->facility->name}";
-            $head_of_unit = $application->headOfUnit ?? (object)['name' => 'Head of Unit'];
-    
-            Mail::to($application->email) // Send to the client
-                ->send(new ApplicationStatusUpdate(
-                    $head_of_unit,
-                    $application->facility,
-                    $application->status,
-                    $message,
-                    $senderEmail,
-                    $subject
-                ));
-        } catch (\Exception $e) {
-            Log::error('Error sending email: ' . $e->getMessage());
-        }
+{
+    try {
+        // Sender details: The currently authenticated NTP manager
+        $user = Auth::user(); // Ensure the user is authenticated
+        $senderEmail = $user->email; // Sender's dynamic email
+        $senderName = $user->name;  // Sender's dynamic name
+
+        // Receiver details: The application's email field
+        $receiverEmail = $application->email; // Receiver's dynamic email
+        $receiverName = $application->head_of_unit; // Head of unit for application
+
+        // Dynamic subject based on facility
+        $subject = "Application Status Update for {$application->facility->name}";
+
+        // Send the email
+        Mail::to($receiverEmail) // Dynamically set the recipient's email
+            ->send(new ApplicationStatusUpdate(
+                $receiverName,         // Receiver's name (e.g., head of unit)
+                $application->facility, // Facility details
+                $application->status,   // Current status of the application
+                $message,               // Custom message
+                $senderEmail,           // Sender's email (dynamic)
+                $subject                // Dynamic subject
+            ));
+    } catch (\Exception $e) {
+        Log::error('Error sending email: ' . $e->getMessage());
     }
+}
     // Show facilities with a 'passed' status
     public function facilities(Request $request)
 {
     // Get the selected province and status from the request
-    $selectedProvince = $request->input('province_city', ''); // Default to empty string
+    $selectedProvince = $request->input('province_city', ''); // Default to empty stringy
     $selectedStatus = $request->input('status', 'all'); // Default to 'all'
 
     // Get unique provinces
     $provinces = DB::table('applications')
-        ->where('status', 'passed')
+        ->where('status', 'passed') 
         ->pluck('province_city')
         ->unique();
 

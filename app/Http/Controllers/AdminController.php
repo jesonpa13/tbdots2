@@ -10,12 +10,11 @@ class AdminController extends Controller
     
     public function dashboard()
     {
-
         $userCount = User::count(); // Total number of users
-        $pendingRequests = 5; // Replace with actual logic for counting pending requests
-
+        $activeRolesCount = User::distinct('user_type')->count('user_type'); // Count distinct roles
+    
         $header = 'Admin Dashboard'; // Set your header text
-        return view('admin.dashboard', compact('header', 'userCount',));
+        return view('admin.dashboard', compact('header', 'userCount', 'activeRolesCount'));
     }
     public function __construct()
     {

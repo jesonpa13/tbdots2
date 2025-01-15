@@ -18,31 +18,33 @@ class RegisteredUserController extends Controller
         // Return the view for the registration form
         return view('auth.register');
     }
+    public function welcomepage()
+    {
+        // Return the view for the registration form
+        return view('welcome');
+    }
     public function store(Request $request)
     {
-        // Validate the registration form inputs
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
-
-        // Create a new user with the default 'client' role
+    
+        // Create the user with a default 'pending' status
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'user_type' => 'client',  // Set the default user_type as 'client'
+            'user_type' => 'client', // Default role
+            'status' => 'pending',   // Default status
         ]);
-
-        // Fire the Registered event
+    
+        // Trigger any events if necessary
         event(new Registered($user));
-
-        // Automatically log in the newly registered user
-        Auth::login($user);
-
-        // Redirect clients to their dashboard after successful registration
-        return redirect()->route('client.dashboard');
+    
+        // Redirect with a pending message
+        return redirect()->route('register')->with('status', 'Your account has been created and is pending approval. Please wait for admin confirmation.');
     }
     
 }

@@ -13,56 +13,63 @@ use Carbon\Carbon;
 class ApplicationController extends Controller
 {
     public function indexdashboard(Request $request)
-{
-    $query = Application::query();
+    {
+        $query = Application::query();
 
+        
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+        
+        $applications = $query->simplePaginate(10)->appends($request->except('page'));
+
+        // counts for ongoing, pending, denied, verified
+        $ongoingCount = Application::where('status', 'ongoing')->count();
+        $pendingCount = Application::where('status', 'pending')->count();
+        $deniedCount = Application::where('status', 'denied')->count();
+        $passedCount = Application::where('status', 'passed')->count();
+        $verifiedCount = Application::where('status', 'verified')->count();
+        return view('pdoho.dashboard', compact('applications', 'ongoingCount', 'pendingCount', 'verifiedCount', 'deniedCount','passedCount'));
+    }
+
+    public function index(Request $request)
+    {
+        // Counts for ongoing, pending, denied, verified
+        $ongoingCount = Application::where('status', 'ongoing')->count();
+        $pendingCount = Application::where('status', 'pending')->count();
+        $deniedCount = Application::where('status', 'denied')->count();
+        $verifiedCount = Application::where('status', 'verified')->count();
+        $passedCount = Application::where('status', 'passed')->count();
     
-    if ($request->filled('status')) {
-        $query->where('status', $request->input('status'));
+        // Initialize the query and exclude 'passed' applications
+        $query = Application::where('status', '!=', 'passed');
+    
+        // Check if the search term is provided
+        if ($request->filled('search')) {
+            $searchTerm = $request->input('search');
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('id', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('facility', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('province_city', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('city', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('address', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('contact_number', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('designation', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('email', 'like', '%' . $searchTerm . '%');
+            });
+        }
+    
+        // Check if the status filter is applied
+        if ($request->filled('status') && $request->input('status') !== 'all') {
+            $query->where('status', $request->input('status'));
+        }
+    
+        // Paginate the filtered applications
+        $applications = $query->simplePaginate(10)->appends($request->except('page'));
+    
+        return view('pdoho.applications', compact('applications', 'ongoingCount', 'pendingCount', 'verifiedCount', 'deniedCount', 'passedCount'));
     }
     
-    $applications = $query->simplePaginate(10)->appends($request->except('page'));
-
-    // counts for ongoing, pending, denied, verified
-    $ongoingCount = Application::where('status', 'ongoing')->count();
-    $pendingCount = Application::where('status', 'pending')->count();
-    $deniedCount = Application::where('status', 'failed')->count();
-    $verifiedCount = Application::where('status', 'verified')->count();
-    $passedCount = Application::where('status', 'passed')->count();
-    return view('pdoho.dashboard', compact('applications', 'ongoingCount', 'pendingCount', 'deniedCount', 'verifiedCount','passedCount'));
-}
-
-public function index(Request $request)
-{
-    $query = Application::query();
-
-    // Check if the search term is provided
-    if ($request->filled('search')) {
-        $searchTerm = $request->input('search');
-        $query->where('id', 'like', '%' . $searchTerm . '%')
-              ->orWhere('facility', 'like', '%' . $searchTerm . '%')
-              ->orWhere('province_city', 'like', '%' . $searchTerm . '%')
-              ->orWhere('address', 'like', '%' . $searchTerm . '%')
-              ->orWhere('contact_number', 'like', '%' . $searchTerm . '%')
-              ->orWhere('designation', 'like', '%' . $searchTerm . '%')
-              ->orWhere('email', 'like', '%' . $searchTerm . '%');
-    }
-
-    // Check if the status filter is applied
-    if ($request->filled('status') && $request->input('status') !== 'all') {
-        $query->where('status', $request->input('status'));
-    }
-
-    $applications = $query->simplePaginate(10)->appends($request->except('page'));
-
-    // Counts for ongoing, pending, denied, verified
-    $ongoingCount = Application::where('status', 'ongoing')->count();
-    $pendingCount = Application::where('status', 'pending')->count();
-    $deniedCount = Application::where('status', 'failed')->count();
-    $verifiedCount = Application::where('status', 'passed')->count();
-    $passedCount = Application::where('status', 'passed')->count();
-    return view('pdoho.applications', compact('applications', 'ongoingCount', 'pendingCount', 'deniedCount', 'verifiedCount','passedCount'));
-}
     public function showStatus()
     {
         
@@ -80,8 +87,8 @@ public function index(Request $request)
 
         $pendingCount = Application::where('status', 'pending')->count();
         $ongoingCount = Application::where('status', 'ongoing')->count();
-        $deniedCount = Application::where('status', 'failed')->count();
-        $verifiedCount = Application::where('status', 'passed')->count();
+        $deniedCount = Application::where('status', 'denied')->count();
+        $verifiedCount = Application::where('status', 'verfied')->count();
         $passedCount= Application::where('status', 'passed')->count();
         return view('client.applicationstatus', compact('statuses','pendingCount', 'ongoingCount', 'deniedCount', 'verifiedCount','passedCount'));
     } 
@@ -91,10 +98,11 @@ public function index(Request $request)
     {
         $pendingCount = Application::where('status', 'pending')->count();
         $ongoingCount = Application::where('status', 'ongoing')->count();
-        $deniedCount = Application::where('status', 'failed')->count();
+        $deniedCount = Application::where('status', 'denied')->count();
         $verifiedCount = Application::where('status', 'verified')->count();
         $passedCount = Application::where('status', 'passed')->count();
-       $applications = Application::simplePaginate(10);  
+        $applications = Application::where('status', '!=', 'passed')->simplePaginate(10);
+
        return view('pdoho.applications', compact('applications', 'pendingCount', 'ongoingCount', 'deniedCount', 'verifiedCount','passedCount'));
     }
 
@@ -160,5 +168,56 @@ public function index(Request $request)
 
         return redirect()->back()->with('error', 'Application not found.');
     }
+    public function edit($id)
+    {
+        // Fetch the application details by ID
+        $application = Application::findOrFail($id);
+
+        // Pass the application details to the edit view
+        return view('client.edit', compact('application'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        // Fetch the application details by ID
+        $application = Application::findOrFail($id);
+
+        // Validate the input data
+        $validatedData = $request->validate([
+            'facility' => 'required|string|max:255',
+            'province_city' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'contact_number' => 'required|string|max:15',
+            'email' => 'required|email|max:255',
+            'intent_upload' => 'nullable|file|mimes:pdf,doc,docx|max:8192', // 8MB limit
+            'assessment_upload' => 'nullable|file|mimes:pdf,doc,docx|max:8192',
+        ]);
+
+        // Update fields
+        $application->facility = $validatedData['facility'];
+        $application->province_city = $validatedData['province_city'];
+        $application->city = $validatedData['city'];
+        $application->contact_number = $validatedData['contact_number'];
+        $application->email = $validatedData['email'];
+
+        // Handle file uploads
+        if ($request->hasFile('intent_upload')) {
+            $path = $request->file('intent_upload')->store('public/uploads');
+            $application->intent_upload = str_replace('public/', '', $path);
+        }
+
+        if ($request->hasFile('assessment_upload')) {
+            $path = $request->file('assessment_upload')->store('public/uploads');
+            $application->assessment_upload = str_replace('public/', '', $path);
+        }
+
+        // Save changes
+        $application->save();
+
+        // Redirect back with a success message
+        return redirect()->route('client.applicationstatus', $application->id)->with('success', 'Application updated successfully.');
+    }
+
+
 
 }

@@ -53,22 +53,31 @@
                                 <i class="fas fa-trash-alt"></i> Delete
                             </button>
                         </form>
-                        <!-- Toggle Activation Status -->
-                        @if($user->status === 'active')
-                            <form action="{{ route('admin.users.deactivate', $user) }}" method="POST" style="display:inline;">
-                                @csrf
-                                <button type="submit" class="btn btn-secondary">
-                                    <i class="fas fa-user-slash"></i> Deactivate
-                                </button>
-                            </form>
-                        @else
-                            <form action="{{ route('admin.users.activate', $user) }}" method="POST" style="display:inline;">
-                                @csrf
-                                <button type="submit" class="btn btn-success">
-                                    <i class="fas fa-user-check"></i> Activate
-                                </button>
-                            </form>
-                        @endif
+
+                        <!-- Toggle Activation Status using updateStatus method -->
+                        @if($user->status === 'pending')
+                        <!-- Approve Button -->
+                        <form action="{{ route('admin.users.approve', $user) }}" method="POST" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-success">Approve</button>
+                        </form>
+                    @elseif($user->status === 'active')
+                        <!-- Deactivate Button -->
+                        <form action="{{ route('admin.users.deactivate', $user) }}" method="POST" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-secondary">
+                                <i class="fas fa-user-slash"></i> Deactivate
+                            </button>
+                        </form>
+                    @elseif($user->status === 'inactive')
+                        <!-- Activate Button -->
+                        <form action="{{ route('admin.users.activate', $user) }}" method="POST" style="display:inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-user-check"></i> Activate
+                            </button>
+                        </form>
+                    @endif
 
                     </td>
                 </tr>

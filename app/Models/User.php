@@ -83,4 +83,10 @@ class User extends Authenticatable
     {
         return $this->status === 'active';
     }
+    // Define the relationship with AdditionalInformation
+    public function additionalInformation()
+    {
+        return $this->hasOne(AdditionalInformation::class);
+    }
+    
 }

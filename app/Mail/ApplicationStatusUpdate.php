@@ -26,12 +26,11 @@ class ApplicationStatusUpdate extends Mailable
         $this->senderEmail = $senderEmail;
         $this->subject = $subject;
     }
-
     public function build()
     {
         return $this
-            ->from($this->senderEmail)
-            ->subject($this->subject)
-            ->view('emails.application_status_update'); // Make sure this view exists
+            ->from($this->senderEmail) // Dynamic sender email
+            ->subject($this->subject)  // Dynamic subject
+            ->view('emails.application_status_update'); // Email view
     }
 }

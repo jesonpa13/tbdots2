@@ -31,36 +31,39 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
-         // Get the authenticated user
-    $user = auth()->user();
-
-    // Check if the user status is inactive
-    if ($user->status === 'inactive') {
-        // Log the user out immediately
-        Auth::logout();
-
-        // Redirect back to the login page with an error message
-        return redirect()->route('login')->withErrors([
-            'status' => 'Your account is inactive. Please contact support for assistance.',
-        ]);
-    }
+        $request->authenticate(); // Authenticate the user
+        $user = auth()->user();   // Get the authenticated user
+    
+        // Check for pending account status
+        if ($user->status === 'pending') {
+            Auth::logout(); // Ensure they cannot access the dashboard
+            return redirect()->route('login')->withErrors([
+                'status' => 'Your account is under review. Please wait for admin approval.',
+            ]);
+        }
+    
+        // Check for inactive account status
+        if ($user->status === 'inactive') {
+            Auth::logout(); // Logout the user if account is inactive
+            return redirect()->route('login')->withErrors([
+                'status' => 'Your account is inactive. Please contact support for assistance.',
+            ]);
+        }
+    
         $request->session()->regenerate();
-
-    $user = auth()->user();
-
-    switch ($user->user_type) {
-        case 'admin':
-            return redirect()->route('admin.dashboard');
-        case 'client':
-            return redirect()->route('client.dashboard');
-        case 'inspector':
-            return redirect()->route('pdoho.dashboard');
-        case 'supervisor':
-            return redirect()->route('ntpmanager.dashboard');
-        default:
-            return redirect()->intended(RouteServiceProvider::HOME);
-    }
+    
+        switch ($user->user_type) {
+            case 'admin':
+                return redirect()->route('admin.dashboard');
+            case 'client':
+                return redirect()->route('client.dashboard');
+            case 'inspector':
+                return redirect()->route('pdoho.dashboard');
+            case 'supervisor':
+                return redirect()->route('ntpmanager.dashboard');
+            default:
+                return redirect()->intended(RouteServiceProvider::HOME);
+        }
     }
 
     /**

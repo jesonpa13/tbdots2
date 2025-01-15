@@ -12,7 +12,7 @@
                     <div class="card-body text-center">
                         <!-- Icon and Title -->
                         <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
-                        <h5 class="card-title text-success">Total Applications (Passed & Verified)</h5>
+                        <h5 class="card-title text-success">Total Verified Applications</h5>
                         <p class="card-text display-4">{{ $totalApplications }}</p>
                     </div>
                 </div>
@@ -24,7 +24,7 @@
                     <div class="card-body text-center">
                         <!-- Icon and Title -->
                         <i class="fas fa-building fa-4x text-primary mb-3"></i>
-                        <h5 class="card-title text-primary">Total DOTS CERTIFICATION REGISTRY</h5>
+                        <h5 class="card-title text-primary">Total Passed Applications</h5>
                         <p class="card-text display-4">{{ $totalFacilities }}</p>
                     </div>
                 </div>

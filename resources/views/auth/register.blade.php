@@ -14,14 +14,14 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 1) 10%, rgba(173, 255, 47, 1) 40%, rgba(34, 139, 34, 1) 70%, rgba(255, 255, 224, 1) 100%);
+            background: linear-gradient(90deg, rgba(133,231,118,1) 0%, rgba(29,194,7,1) 50%, rgba(16,162,0,1) 100%);
             background-size: 400% 400%;
             background-attachment: fixed;
             position: relative;
-            animation: gradient 15s ease infinite;
+            
         }
 
-        .container {
+        .container { 
             display: flex;
             max-width: 1200px;
             width: 100%;
@@ -135,31 +135,7 @@
             background-color: #cc0000;
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-            }
-            .left-side {
-                padding: 20px;
-            }
-            .form-buttons {
-                flex-direction: column;
-                gap: 15px;
-            }
-        }
 
-        @keyframes gradient {
-            0% {
-                background-position: 0% 0%;
-            }
-            50% {
-                background-position: 100% 100%;
-            }
-            100% {
-                background-position: 0% 0%;
-            }
-        }
     </style>
 </head>
 <body>
@@ -174,9 +150,10 @@
 
         <!-- Right Side for Form -->
         <div class="right-side">
-            <div class="form-container">
+        <div class="form-container">
                 <h1>Sign Up Here</h1>
-                <form>
+                <form method="POST" action="{{ route('register') }}">
+                @csrf
                     <div class="form-group">
                         <label for="name">Name</label>
                         <input type="text" id="name" name="name" required>
@@ -193,13 +170,15 @@
                         <label for="password_confirmation">Confirm Password</label>
                         <input type="password" id="password_confirmation" name="password_confirmation" required>
                     </div>
-                    <div class="form-buttons">
-                        <button type="submit" class="register-button">Register</button>
-                        <a href="{{ route('welcome') }}">
-                        <button type="button" class="cancel-button">Cancel</button>
-                    </a>
-                    </div>
+                    <button type="submit" class="register-button">Register</button>
+                    <a href="{{ route('welcome') }}" class="cancel-button">Cancel</a>
                 </form>
+
+                @if(session('status'))
+    <div class="alert alert-info" style="margin-top: 20px; color: #555; background: #f0f8ff; padding: 10px; border-radius: 5px;">
+        {{ session('status') }}
+    </div>
+@endif
             </div>
         </div>
     </div>

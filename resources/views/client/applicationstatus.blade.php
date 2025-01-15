@@ -4,29 +4,34 @@
     <div class="">
         <h2 class="mb-4">Application Status</h2>
 
-        
-    @if(session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
-    @endif
+        @if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
 
         <table class="table table-hover table-striped table-bordered" style="border-color: #333333;">
             <thead class="table-light">
             <tr style="background-color: #4caf50; color: white;">
-                    <th>ID</th>
-                    <th>Facility</th>
-                    <th>Province</th>
-                    <th>City</th>
-                    <th>Contact Number</th>
-                    <th>View Letter</th>
-                    <th>View Assessment</th>
-                    <th>Status</th>
-                    <th>Remarks</th>
-                </tr>
+                <th>ID</th>
+                <th>Facility</th>
+                <th>Province</th>
+                <th>City</th>
+                <th>Contact Number</th>
+                <th>View Letter</th>
+                <th>View Assessment</th>
+                <th>Status</th>
+                <th>Actions</th>
+                <th>Remarks</th>
+            </tr>
             </thead>
             <tbody>
-                @foreach ($statuses as $application)    
+            @if ($statuses->isEmpty())
+                <tr>
+                    <td colspan="9" class="text-center">No applications found</td>
+                </tr>
+            @else
+                @foreach ($statuses as $application)
                     <tr>
                         <td>{{ $application->id }}</td>
                         <td>{{ $application->facility }}</td>
@@ -42,8 +47,9 @@
                         <td>
                             <strong>
                                 <span class="{{ $application->status === 'ongoing' ? 'text-orange' : '' }} 
-                                    {{ $application->status === 'passed' ? 'text-success' : '' }} 
-                                    {{ $application->status === 'failed' ? 'text-danger' : '' }}">
+                                    {{ $application->status === 'verified' ? 'text-success' : '' }} 
+                                     {{ $application->status === 'passed' ? 'text-success' : '' }} 
+                                    {{ $application->status === 'denied' ? 'text-danger' : '' }}">
                                     {{ ucfirst($application->status) }}
                                 </span>
                                 @if($application->status === 'ongoing' && $application->visit_date)
@@ -51,6 +57,17 @@
                                     <small class="text-muted">Visitation Date: {{ \Carbon\Carbon::parse($application->visit_date)->format('F j, Y') }}</small>
                                 @endif
                             </strong>
+                        </td>
+                        <td>
+                            @if ($application->status === 'pending')
+                                <a href="{{ route('edit.application', ['id' => $application->id]) }}" class="btn btn-primary">
+                                    Edit
+                                </a>
+                            @else
+                                <button class="btn btn-secondary" disabled>
+                                    Edit
+                                </button>
+                            @endif
                         </td>
                         <td>
                             <button class="btn btn-success view-remarks" 
@@ -62,6 +79,7 @@
                         </td>
                     </tr>
                 @endforeach
+            @endif
             </tbody>
         </table>
     </div>
